@@ -6,7 +6,7 @@
 
 from json import loads
 from tempfile import NamedTemporaryFile
-from unittest import IsolatedAsyncioTestCase, TestCase
+from unittest import IsolatedAsyncioTestCase
 
 import aiofiles
 
