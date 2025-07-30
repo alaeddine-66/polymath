@@ -1,6 +1,7 @@
 from agent.logic.prompt_reviser import PromptReviser
+from typing import Dict, Optional, Tuple, Any
 
-class NoOpPromptReviser(PromptReviser):
+class NullPromptReviser(PromptReviser):
     """
     A no-operation implementation of PromptReviser that does nothing.
     Used when no prompt reviser is needed but the interface must be fulfilled.
