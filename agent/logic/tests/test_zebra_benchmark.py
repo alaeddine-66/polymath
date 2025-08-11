@@ -169,7 +169,7 @@ class TestZebraBenchmark(IsolatedAsyncioTestCase):
                 eval_json_file_name,
                 "meta-llama/Meta-Llama-3.1-70B-Instruct@reasoning",
                 "llama3-70b-instruct",
-                False,
+                True,
                 False,
                 None,
                 False,
