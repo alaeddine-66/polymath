@@ -18,7 +18,7 @@ class LlamaChatCompletion(ChatCompletion):
         model_path: str,
         max_gen_tokens: int,
         temperature: float,
-        gpu_id = 0,
+        gpu_id: int,
     ) -> None:
         self.__logger: Logger = logger_factory(__name__)
         self.__model_path = model_path
@@ -106,12 +106,12 @@ class LlamaChatCompletion(ChatCompletion):
     ) -> Tuple[FinishReason, Optional[str]]:
         chat, tokenizer, model  = self.__model
 
-        conversation= self._convert_conversation(conversation)
+        messages = self._convert_conversation(conversation)
         loop = asyncio.get_running_loop()
 
         def generate_sync():
 
-            prompt = tokenizer.apply_chat_template(conversation, tokenize=False, add_generation_prompt=True)
+            prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
 
             outputs = chat(
                 prompt,

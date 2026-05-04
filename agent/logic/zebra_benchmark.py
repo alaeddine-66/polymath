@@ -16,7 +16,7 @@ import aiofiles
 
 from agent.logic.agent import LogicAgent
 from agent.logic.engine_strategy_factory import EngineStrategyFactory
-from agent.logic.engine_strategy_factory import CbmcStrategyFactory
+from agent.logic.engine_strategy_factory import CbmcStrategyFactory, PrologStrategyFactory
 from agent.logic.engine_strategy import EngineStrategy
 from agent.logic.model_only import ModelOnlySolver
 from aiofiles.base import AiofilesContextManager
@@ -112,7 +112,7 @@ class ZebraBenchmark:
                 module_path, "../../datasets/grid_mode/test-00000-of-00001.parquet"
             )
         self.__chat_completion_1: ChatCompletion = None
-        self.__logger_factory = None
+        self.__logger_factory : Optional[LoggerFactory] = None
         self.zebra_comparator: SolutionComparator = ZebraSolutionComparator()
 
     async def __aenter__(self) -> "ZebraBenchmark":
@@ -228,7 +228,7 @@ class ZebraBenchmark:
                     "success":success,
                     "nb_err": nb_err,
                     "better_prompt": engine_strategy.constraints_prompt,
-                    "better_tempertature":solver.__curr_temperature,
+                    #"better_tempertature":model.__temperature,
                     "polymath_metadata": {
                         "num_agent_retries": result_trace.num_agent_retries,
                         "num_logic_py_syntax_errors": result_trace.num_logic_py_syntax_errors,
@@ -466,11 +466,11 @@ async def main():
          #    "meta-llama/LLaMA-3.1-8B@reasoning",
          #    "llama-3.1-8b-instant",
          #),
-        #(
-        #  path.join(module_path, "LLaMA-3.3-70B-Versatile-5*6-26@reasoning.json"),
-        # "metadata-llama/LLaMA-3.3-70B-Versatile@reasoning",
-        #   "llama-3.3-70b-versatile",
-        #),
+        (
+          path.join(module_path, "LLaMA-3.3-70B-Versatile-5*6-26@reasoning.json"),
+         "metadata-llama/LLaMA-3.3-70B-Versatile@reasoning",
+           "llama-3.3-70b-versatile",
+        ),
 
 ## Mistral Local
 	#(
@@ -480,14 +480,14 @@ async def main():
         #),
 
 ##Llama Local
-        (
-          path.join(module_path, "Llama-3.3-70B@Instruct-Review.json"),
-         "Llama_models/Llama-70B-v3.3@Instruct",
-         "/srv/data/Llama-3.3-70B-Instruct",
-       ),
+        #(
+        #  path.join(module_path, "Llama-3.3-70B@Instruct-Review.json"),
+        # "Llama_models/Llama-70B-v3.3@Instruct",
+        # "/srv/data/Llama-3.3-70B-Instruct",
+       #),
     ]
-    # Solver_factory: EngineStrategyFactory = PrologStrategyFactory()
-    Solver_factory: EngineStrategyFactory = CbmcStrategyFactory()
+    Solver_factory: EngineStrategyFactory = PrologStrategyFactory()
+    #Solver_factory: EngineStrategyFactory = CbmcStrategyFactory()
 
     for model in models:
         async with ZebraBenchmark(

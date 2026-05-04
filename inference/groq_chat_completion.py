@@ -4,6 +4,7 @@ from typing import Callable, Optional, Tuple
 
 from inference.chat_completion import ChatCompletion, Message
 from inference.finish_reason import FinishReason
+from langchain_groq import ChatGroq
 
 import os
 import aiohttp
@@ -20,15 +21,24 @@ class GroqChatCompletion(ChatCompletion):
         model_name: str,
         max_gen_tokens: int,
         temperature: float,
+        gpu_id: int,
     ) -> None:
         self.__logger: Logger = logger_factory(__name__)
         self.__model_name = model_name
         self.__max_gen_tokens = max_gen_tokens
         self.__temperature = temperature
+        self.__initial_temperature = temperature
+        self.__gpu_id = gpu_id
 
-        self.__api_url = "https://api.groq.com/openai/v1/chat/completions"
+        self.__client: Optional[ChatGroq] = None
 
     async def __aenter__(self) -> "GroqChatCompletion":
+        self.__client = ChatGroq(
+            model=self.__model_name,
+            temperature=self.__temperature,
+            max_tokens=self.__max_gen_tokens,
+            api_key=os.environ["GROQ_API_KEY"],
+        )
         return self
 
     async def __aexit__(
@@ -45,39 +55,37 @@ class GroqChatCompletion(ChatCompletion):
     async def create(
         self, conversation: list[Message]) -> Tuple[FinishReason, Optional[str]]:
 
-        headers = {
-            "Authorization": f"Bearer {os.environ['GROQ_API_KEY']}",
-            "Content-Type": "application/json",
-        }
 
-        messages = [
-            {"role": msg.role.lower(), "content": msg.text}
-            for msg in conversation
-        ]
+        if self.__client is None:
+            self.__logger.error("Client not initialized")
+            return FinishReason.RETRYABLE_ERROR, None
+        try:
+            messages = [
+                (msg.role.lower(), msg.text)
+                for msg in conversation
+            ]
 
-        payload = {
-            "model": self.__model_name,
-            "messages": messages,
-            "temperature": self.__temperature,
-            "max_tokens": self.__max_gen_tokens,
-        }
+            if hasattr(self.__client, "ainvoke"):
+                response = await self.__client.ainvoke(messages)
+            else:
+                response = await asyncio.to_thread(
+                    self.__client.invoke, messages
+                )
 
-        async with aiohttp.ClientSession() as session:
-            try:
-                async with session.post(self.__api_url, headers=headers, json=payload) as response:
-                    if response.status != 200:
-                        self.__logger.error(f"Groq API Error: {response.status}")
-                        return FinishReason.RETRYABLE_ERROR, None
+            content = response.content
 
-                    data = await response.json()
-
-                    finish_reason = data["choices"][0]["finish_reason"]
-                    content = data["choices"][0]["message"]["content"]
-
-                    if finish_reason == "length":
-                        return FinishReason.MAX_OUTPUT_TOKENS, content
-                    return FinishReason.STOPPED, content
-
-            except Exception as e:
-                self.__logger.error(f"Exception in Groq API call: {e}")
+            if content is None or content.strip() == "":
                 return FinishReason.RETRYABLE_ERROR, None
+
+            return FinishReason.STOPPED, content
+        
+        except Exception as e:
+            self.__logger.error(f"Exception in Groq call: {e}")
+            return FinishReason.RETRYABLE_ERROR, None
+
+
+    def set_temperature(self, temperature: float) -> None:
+        self.__temperature = temperature
+
+    def reset_temperature(self) -> None:
+        self.__temperature = self.__initial_temperature

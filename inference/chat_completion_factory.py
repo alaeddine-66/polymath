@@ -23,8 +23,7 @@ DEFAULT_TEMPERATURE: float = 1e-5
 
 
 def create_chat_completion(
-        logger_factory: LoggerFactory, model_name: str, gpu_id: int = 0,
-) -> ChatCompletion:
+        logger_factory: LoggerFactory, model_name: str, gpu_id: int = 0) -> ChatCompletion:
     """
     Default factory for chat completion API. Modifying this method allows to
     activate a custom chat completion API (e.g. OpenAI) across benchmarks and
@@ -49,7 +48,7 @@ def create_chat_completion(
             model_name,
             DEFAULT_MAX_GEN_TOKENS,
             DEFAULT_TEMPERATURE,
-            gpu_id = gpu_id
+            gpu_id
         )
 
     return DummyChatCompletion(
@@ -57,5 +56,5 @@ def create_chat_completion(
         model_name,
         DEFAULT_MAX_GEN_TOKENS,
         DEFAULT_TEMPERATURE,
-        gpu_id = gpu_id,
+        gpu_id,
     )

@@ -37,11 +37,11 @@ class OllamaChatCompletion(ChatCompletion):
         self, conversation: List[Message]
     ) -> Tuple[FinishReason, Optional[str]]:
 
-        conversation= [{"role":msg.role, "content":msg.text} for msg in conversation]
+        messages = [{"role":msg.role, "content":msg.text} for msg in conversation]
         loop = asyncio.get_running_loop()
 
         def generate_sync():
-            return ollama.chat(model=self.__model_path, messages=conversation)
+            return ollama.chat(model=self.__model_path, messages=messages)
         try:
             result = await loop.run_in_executor(None, generate_sync)
             print(result['message']['content'])

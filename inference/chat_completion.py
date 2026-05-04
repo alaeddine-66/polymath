@@ -71,3 +71,9 @@ class ChatCompletion(ABC):
         Returns: Tuple of finish reason and LLM response text.
         """
         ...
+
+    def set_temperature(self, temperature: float) -> None:
+        pass
+
+    def reset_temperature(self) -> None:
+        pass

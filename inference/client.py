@@ -7,7 +7,7 @@
 import asyncio
 from logging import Logger
 from random import randrange
-from typing import Callable, Optional
+from typing import Callable, Optional, Tuple
 
 from inference.chat_completion import ChatCompletion, Message, Role
 from inference.finish_reason import FinishReason
@@ -37,7 +37,7 @@ class InferenceClient:
         self.__logger: Logger = logger_factory(__name__)
         self.__chat_completion = chat_completion
     
-    async def create(self, prompt: Message) -> Optional[str]:
+    async def create(self, prompt: Message) -> Tuple[FinishReason, Optional[str]]:
         finish_reason, ai_response = await self.__chat_completion.create(
                 [prompt]
             )

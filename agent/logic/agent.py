@@ -248,7 +248,7 @@ Constraints:
             stdout: str
             stderr: str
             async with NamedTemporaryFile(
-                mode="w", suffix=solver_input_file_suffix , delete_on_close=False
+                mode="w", suffix=solver_input_file_suffix, delete=False  
             ) as file:
                 await file.write(solver_constraints)
                 await file.close()

@@ -20,11 +20,14 @@ class MistralChatCompletion(ChatCompletion):
         model_path: str,
         max_gen_tokens: int,
         temperature: float,
+        gpu_id: int,
     ) -> None:
         self.__logger: Logger = logger_factory(__name__)
         self.__model_path = model_path
         self.__max_gen_tokens = max_gen_tokens
         self.__temperature = temperature
+        self.__initial_temperature = temperature
+        self.__gpu_id = gpu_id
 
         self.__model = None  # (tokenizer, model)
         self.__lock = asyncio.Lock()
@@ -102,3 +105,9 @@ class MistralChatCompletion(ChatCompletion):
         except Exception as e:
             self.__logger.error(f"Unexpected error during generation: {e}")
             return FinishReason.RETRYABLE_ERROR, None
+
+    def set_temperature(self, temperature: float) -> None:
+        self.__temperature = temperature
+
+    def reset_temperature(self) -> None:
+        self.__temperature = self.__initial_temperature

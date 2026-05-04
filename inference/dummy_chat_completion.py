@@ -25,14 +25,15 @@ class DummyChatCompletion(ChatCompletion):
         logger_factory: Callable[[str], Logger],
         model_name: str,
         max_gen_tokens: int,
-        max_tokens: int,
         temperature: float,
+        gpu_id : int,
     ) -> None:
         self.__logger: Logger = logger_factory(__name__)
         self.__model_name = model_name
         self.__max_gen_tokens = max_gen_tokens
-        self.__max_tokens = max_tokens
         self.__temperature = temperature
+        self.__initial_temperature = temperature
+        self.__gpu_id = gpu_id
 
     async def __aenter__(self) -> "DummyChatCompletion":
         return self
@@ -49,3 +50,9 @@ class DummyChatCompletion(ChatCompletion):
         self, conversation: list[Message]
     ) -> Tuple[FinishReason, Optional[str]]:
         return FinishReason.STOPPED, "Hello! I am very intelligent!"
+
+    def set_temperature(self, temperature: float) -> None:
+        self.__temperature = temperature
+
+    def reset_temperature(self) -> None:
+        self.__temperature = self.__initial_temperature

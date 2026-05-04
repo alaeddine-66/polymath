@@ -32,7 +32,7 @@ class PromptReviser(ABC):
 
 
     @abstractmethod
-    async def revise(self, constraints_prompt: str, code: str, error_details: str) -> str:
+    async def revise(self, constraints_prompt: str, code: str, error_details: str):
         """
         Generates a revised constraint prompt based on the previous prompt,
         the LLM-generated code, and any error details encountered during execution.
@@ -48,12 +48,11 @@ class PromptReviser(ABC):
         ...
 
     @abstractmethod
-    def compare(self, solution: Dict[str, Any], outcome: Optional[str]) -> Tuple[bool, str]:
+    def compare(self, outcome: Optional[str]) -> Tuple[bool, str]:
         """
         Compares the LLM's predicted solution with the ground truth.
 
         Args:
-            solution (Dict[str, Any]): The expected correct solution.
             outcome (Optional[str]): The LLM's predicted output (e.g., a parsed solution).
 
         Returns:

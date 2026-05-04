@@ -9,14 +9,14 @@ from importlib.machinery import ModuleSpec
 from importlib.util import module_from_spec, spec_from_file_location
 from os import getenv
 from types import ModuleType
-from typing import Optional, Type, TypeVar
+from typing import Optional, Type, TypeVar, Generic
 
 
 # Interface that the class provided by the plug-in should implement.
 PluginInterface = TypeVar("PluginInterface")
 
 
-class PluginLoader[PluginInterface]:
+class PluginLoader(Generic[PluginInterface]):
     """
     Helper to load external classes impolementing an expected interface.
     """

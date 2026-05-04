@@ -50,13 +50,11 @@ class EngineStrategy(ABC):
         """
         ...
 
-    def set_initial_constraints_prompt(self, prompt) -> None:
+    def set_initial_constraints_prompt(self) -> None:
         """
         Sets the initial constraint-generation prompt. This can be used to
         establish a reference point for future resets or comparisons.
 
-        Args:
-            prompt (str): The original constraint-generation prompt.
         """
         ...
 
@@ -83,6 +81,9 @@ class EngineStrategy(ABC):
         Prompt sent to the LLM instructing it to generate the basic data
         structure over which it would like to express constraints.
         """
+        ...
+
+    def get_revise_prompt(self, prompt: str, generated_dsl: str, output: str) -> str:
         ...
 
     @abstractmethod
@@ -142,6 +143,8 @@ class EngineStrategy(ABC):
             Formatting prompt to send to LLM.
         """
         ...
+
+
 
     @abstractmethod
     def parse_solver_output(
