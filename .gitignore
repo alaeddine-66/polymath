@@ -13,7 +13,6 @@ __pycache__
 *.fls
 *.log
 *.out
-*.pdf
 *.tar.gz
 benchmark-results
 build
